@@ -58,7 +58,9 @@ public class TaskAdapter extends ArrayAdapter<Task> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), CreateEditTask.class);
+               intent.putExtra("id_task", task.getId());
                intent.putExtra("name_task", task.getName());
+               intent.putExtra("date_task", task.getDate());
                intent.putExtra("time_task", task.getTime());
                intent.putExtra("description_task", task.getDescription());
                 getContext().startActivity(intent);

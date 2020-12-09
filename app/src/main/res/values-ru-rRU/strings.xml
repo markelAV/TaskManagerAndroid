@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Менеджер задач</string>
+    <string name="text_today">Сегодня</string>
+    <string name="text_tasks">Задачи</string>
+    <string name="text_name">Название</string>
+    <string name="text_date">Дата</string>
+    <string name="text_time">Время</string>
+    <string name="text_description">Описание</string>
+    <string name="text_save">Сохранить</string>
+    <string name="text_edit">Изменить</string>
+    <string name="text_add_task">Добавить</string>
+    <string name="text_synchronize">Синхронизировать</string>
+    <string name="text_track">Маршрут</string>
+    <string name="text_create">Создать</string>
+    <string name="text_delete">Удалить</string>
+</resources>
