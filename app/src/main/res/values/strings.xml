@@ -33,4 +33,7 @@
     <string name="text_track">Track</string>
     <string name="text_create">Create</string>
     <string name="text_delete">Delete</string>
+    <string name="text_update">Update</string>
+    <string name="notification_update">Update...</string>
+    <string name="notification_synchronize">Synchronize...</string>
 </resources>

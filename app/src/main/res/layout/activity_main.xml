@@ -8,6 +8,28 @@
     android:weightSum="6"
     android:padding="16dp"
     tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/notification_banner_update"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="@string/notification_update"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:shadowRadius="5"
+        android:background="@color/teal_700"
+        android:visibility="gone"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/notification_banner_synchronize"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="@string/notification_synchronize"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:shadowRadius="5"
+        android:background="@color/teal_700"
+        android:visibility="gone"
+        android:textSize="18sp" />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

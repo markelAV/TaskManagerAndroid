@@ -9,7 +9,11 @@
         android:orderInCategory="2"
         android:title="@string/text_synchronize" />
     <item
-        android:id="@+id/open_track"
+        android:id="@+id/action_load_tasks"
         android:orderInCategory="3"
+        android:title="@string/text_update" />
+    <item
+        android:id="@+id/open_track"
+        android:orderInCategory="4"
         android:title="@string/text_track" />
 </menu>

@@ -14,4 +14,7 @@
     <string name="text_track">Маршрут</string>
     <string name="text_create">Создать</string>
     <string name="text_delete">Удалить</string>
+    <string name="text_update">Обновить</string>
+    <string name="notification_update">Обновление...</string>
+    <string name="notification_synchronize">Синхронизация</string>
 </resources>

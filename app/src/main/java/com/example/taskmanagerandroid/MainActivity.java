@@ -3,7 +3,9 @@ package com.example.taskmanagerandroid;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,10 +13,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CalendarView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.taskmanagerandroid.adapter.DatabaseAdapter;
 import com.example.taskmanagerandroid.adapter.TaskAdapter;
 import com.example.taskmanagerandroid.data.model.Task;
+import com.example.taskmanagerandroid.service.TaskSynchronizeService;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.text.DateFormat;
@@ -30,26 +34,34 @@ public class MainActivity extends AppCompatActivity {
     private final String SELECT_DATE = "selectDate";
     private ArrayList<Task> tasks;
     private TaskAdapter adapter;
+
     private ListView taskList;
     private String selectDate;
     private CalendarView calendarView;
+    private TextView notificationBannerUpdate;
+    private TextView notificationBannerSynchronize;
+
+    private Context contextTaskSync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        this.contextTaskSync = this.getApplicationContext();
         String todayDate = new Date().toString();
         Date todayDate2 = new Date();
         DateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
         DateFormat formatter1 = new SimpleDateFormat("dd.MM.yyyy");
         String fromat = formatter1.format(todayDate2);
-        fromat = fromat.charAt(0) == '0'? fromat.substring(1) : fromat;
+        fromat = fromat.charAt(0) == '0' ? fromat.substring(1) : fromat;
         this.selectDate = fromat;
         String[] datesForView = todayDate.split(" ");
-        String dateForView = datesForView[0] + " " +datesForView[1] + " " +datesForView[2]; //Fixme use StringBuilder
+        String dateForView = datesForView[0] + " " + datesForView[1] + " " + datesForView[2]; //Fixme use StringBuilder
         MaterialTextView editTextDate = (MaterialTextView) (findViewById(R.id.text_date_today));
         editTextDate.setText(dateForView);
+        notificationBannerUpdate = (TextView) findViewById(R.id.notification_banner_update);
+        notificationBannerSynchronize = (TextView) findViewById(R.id.notification_banner_synchronize);
         calendarView = (CalendarView) findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -84,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Date date = formatter1.parse(this.selectDate);
             this.calendarView.setDate(date.getTime());
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             System.out.println("Error not selected");
             System.out.println(ex.getMessage());
         }
@@ -97,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
         DatabaseAdapter adapterDatabase = new DatabaseAdapter(this);
         adapterDatabase.open();
         System.out.println("Get task for date: " + this.selectDate);
-        ArrayList<Task> tasks = (ArrayList<Task>)adapterDatabase.getTaskByDate(this.selectDate);
-        if(tasks == null) {
+        ArrayList<Task> tasks = (ArrayList<Task>) adapterDatabase.getTaskByDate(this.selectDate);
+        if (tasks == null) {
             tasks = new ArrayList<>(); // getTaskByDate can return null for that case
         } else {
             Collections.sort(tasks);
         }
 
-        adapter = new TaskAdapter(this, R.layout.task_list_item,  tasks);
+        adapter = new TaskAdapter(this, R.layout.task_list_item, tasks);
         taskList.setAdapter(adapter);
         taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -138,14 +149,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch(id){
-            case R.id.action_add :
+        switch (id) {
+            case R.id.action_add:
                 Intent intent = new Intent(this, CreateEditTask.class);
                 startActivity(intent);
                 return true;
             case R.id.action_synchronize:
                 this.synchronize();
                 return true;
+            case R.id.action_load_tasks:
+                this.updateTasks();
             case R.id.open_track:
                 System.out.println("Проложить маршрут");
                 return true;
@@ -172,14 +185,68 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("Adapter is updated");
     }
 
-    private boolean synchronize () {
+    private boolean synchronize() {
         //Todo complete result for cache errors when send request on server
+        notificationBannerSynchronize.setVisibility(View.VISIBLE);
         boolean result = false;
         System.out.println("Call synchronize");
+        new ProgressTask().execute("synchronize");
         return result;
     }
+
+    private void updateTasks() {
+        notificationBannerUpdate.setVisibility(View.VISIBLE);
+        System.out.println("Call update");
+        new ProgressTask().execute("update");
+    }
+
 
     public String getSelectDate() {
         return selectDate;
     }
+
+    private class ProgressTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... action) {
+            String content = null;
+            if (action != null && action.length > 0) {
+                String currentAction = action[0];
+                TaskSynchronizeService service = new TaskSynchronizeService(contextTaskSync);
+                switch (currentAction) {
+                    case "update":
+                        content = service.updateTasksFromServer() > 0? currentAction: null;
+                        return content;
+                    case "synchronize":
+                        content = service.synchronizeTasks()? currentAction: null;
+                        return content;
+                    case "test":
+                        content = service.testConnection()? currentAction: null;
+                        return content;
+                }
+
+            }
+
+
+            return content;
+        }
+
+        @Override
+        protected void onPostExecute(String content) {
+            //Todo complete work with notification
+            notificationBannerUpdate.setVisibility(View.GONE);
+            notificationBannerSynchronize.setVisibility(View.GONE);
+            if(content != null) {
+                System.out.println("[Debug] hide notification action is " + content);
+                if(content.equals("update")){
+                    System.out.println("[Debug] run updates list");
+                    updateListTask();
+                }
+            }
+            else {
+                System.out.println("[Debug] don`t run updates list because content is null");
+            }
+
+        }
+    }
+
 }

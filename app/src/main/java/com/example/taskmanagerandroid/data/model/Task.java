@@ -1,6 +1,10 @@
 package com.example.taskmanagerandroid.data.model;
 
-import java.util.Objects;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Task implements Comparable<Task> {
     private String name;
@@ -107,5 +111,31 @@ public class Task implements Comparable<Task> {
             return  time2 - time1;
         }
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        DateFormat formatter1 = new SimpleDateFormat("dd.MM.yyyy");
+        String date = this.date;
+        if (date != null) {
+            try {
+                Date convertDate = formatter1.parse(date);
+                date = formatter1.format(convertDate);
+            } catch (ParseException ex) {
+                System.out.println("[ERROR] Date not normalized");
+                System.out.println(ex.getMessage());
+            }
+        }
+         date = date + " " + time;
+
+        builder.append('{').append("\"id\":").append("\"").append(id).append("\",")
+                .append("\"name\":").append("\"").append(name).append("\",")
+                .append("\"date\":").append("\"").append(date).append("\",")
+                .append("\"complete\":").append(complete).append(",")
+                .append("\"description\":").append("\"").append(description).append("\"")
+                .append('}');
+
+        return builder.toString();
     }
 }
