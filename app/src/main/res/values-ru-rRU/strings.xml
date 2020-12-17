@@ -16,5 +16,6 @@
     <string name="text_delete">Удалить</string>
     <string name="text_update">Обновить</string>
     <string name="notification_update">Обновление...</string>
-    <string name="notification_synchronize">Синхронизация</string>
+    <string name="notification_synchronize">Синхронизаци...</string>
+    <string name="action_add_locatoin">Добавить локацию</string>
 </resources>

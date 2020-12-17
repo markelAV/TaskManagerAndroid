@@ -56,6 +56,14 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/id_add_location"
+        android:layout_width="287dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="15dp"
+        android:onClick="addLocation"
+        android:text="@string/action_add_locatoin" />
+
+    <Button
         android:id="@+id/id_button_save"
         android:layout_width="287dp"
         android:layout_height="63dp"
